@@ -1,0 +1,7 @@
+solutions/
+.DS_Store
+.ipynb_checkpoints/
+output/*.db*
+*.pyc
+__pycache__/
+data/
