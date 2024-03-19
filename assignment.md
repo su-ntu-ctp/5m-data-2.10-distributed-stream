@@ -2,7 +2,11 @@
 
 ## Brief
 
+Write the Python codes for the following questions.
+
 ## Instructions
+
+Paste the answer as Python in the answer code section below each question.
 
 ### Question 1
 
