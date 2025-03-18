@@ -36,6 +36,13 @@ docker exec --workdir /opt/kafka/bin/ -it broker sh
 ./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic pizza-orders
 ```
 
+Full removal at the end: 
+
+```
+docker rm -f broker
+```
+
+Reference: https://hub.docker.com/r/apache/kafka
 
 
 ---
