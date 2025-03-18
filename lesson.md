@@ -4,9 +4,39 @@
 
 ### Preparation and Lesson Overview
 
-We will be using Google Colaboratory (you can use the same google account created in the previous unit) in this lesson.
+Ensure you have conda setup. Please do:
 
-We will be running Kafka and Spark on Colab. As both Kafka and Spark are distributed frameworks which run on the Java Virtual Machine (JVM), it requires a Java runtime environment to run. Colab comes with a Java runtime environment pre-installed, so we can run Kafka and Spark on Colab without any additional setup.
+```
+conda env update -f environment.yml
+```
+
+This should install the `kafka` conda environment. You can activate it via:
+
+```
+conda activate kafka
+```
+
+Lastly, one more step to install the packages:
+
+```
+pip install -r requirements.txt
+```
+
+Also, we need to host kafka locally via docker: 
+
+```
+docker run -d --name broker apache/kafka:latest -p 9092:9092
+```
+
+```
+docker exec --workdir /opt/kafka/bin/ -it broker sh
+```
+
+```
+./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic pizza-orders
+```
+
+
 
 ---
 
