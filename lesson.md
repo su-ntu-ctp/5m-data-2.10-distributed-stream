@@ -25,7 +25,7 @@ pip install -r requirements.txt
 Also, we need to host kafka locally via docker: 
 
 ```
-docker run -d --name broker apache/kafka:latest -p 9092:9092
+docker run -d --name broker -p 9092:9092 apache/kafka:latest 
 ```
 
 ```
