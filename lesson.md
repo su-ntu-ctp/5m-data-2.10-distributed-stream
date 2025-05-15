@@ -63,6 +63,11 @@ for this section.
 
 Alternatively, we can use [this](https://colab.research.google.com/drive/1WwwGa-tVIqr2aNLPrxqFqFyQAwrxU1JD?usp=sharing) Colab notebook for this section.
 
+If you are using the Colab notebook:
+> Open the Colab link, then go to File -> Save a copy in Drive. This will create a copy of the notebook in your Google Drive. It will then open the notebook in a new tab.
+>
+> Follow on with the lesson in the notebook.
+
 ## Part 3 - Hands-on with Spark (Structured Streaming)
 
 We will be using the notebook
@@ -71,3 +76,8 @@ We will be using the notebook
 for this section.
 
 Alternatively, we can use [this](https://colab.research.google.com/drive/1xSEbQmCNqW0HdyD8Z4jwKqCffTb28W7q?usp=sharing) Colab notebook for this section.
+
+If you are using the Colab notebook:
+> Open the Colab link, then go to File -> Save a copy in Drive. This will create a copy of the notebook in your Google Drive. It will then open the notebook in a new tab.
+>
+> Follow on with the lesson in the notebook.
