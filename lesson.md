@@ -55,16 +55,19 @@ Conceptual knowledge, refer to slides.
 
 ## Part 2 - Hands-on with Kafka
 
-We will be using [this](https://colab.research.google.com/drive/1WwwGa-tVIqr2aNLPrxqFqFyQAwrxU1JD?usp=sharing) Colab notebook for this section.
+We will be using the notebooks
+* notebook/5m_data_2_10_01_Fake_Data_Kafka_Producer.ipynb
+* notebook/5m_data_2_10_02_Hands_on_with_Kafka.ipynb
 
-> Open the Colab link, then go to File -> Save a copy in Drive. This will create a copy of the notebook in your Google Drive. It will then open the notebook in a new tab.
->
-> Follow on with the lesson in the notebook.
+for this section.
+
+Alternatively, we can use [this](https://colab.research.google.com/drive/1WwwGa-tVIqr2aNLPrxqFqFyQAwrxU1JD?usp=sharing) Colab notebook for this section.
 
 ## Part 3 - Hands-on with Spark (Structured Streaming)
 
-We will be using [this](https://colab.research.google.com/drive/1xSEbQmCNqW0HdyD8Z4jwKqCffTb28W7q?usp=sharing) Colab notebook for this section.
+We will be using the notebook
+* notebook/5m_data_2_10_03_Hands_on_with_Spark_(Structured_Streaming).ipynb
 
-> Open the Colab link, then go to File -> Save a copy in Drive. This will create a copy of the notebook in your Google Drive. It will then open the notebook in a new tab.
->
-> Follow on with the lesson in the notebook.
+for this section.
+
+Alternatively, we can use [this](https://colab.research.google.com/drive/1xSEbQmCNqW0HdyD8Z4jwKqCffTb28W7q?usp=sharing) Colab notebook for this section.
