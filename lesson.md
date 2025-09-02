@@ -22,7 +22,11 @@ Lastly, one more step to install the packages:
 pip install -r requirements.txt
 ```
 
-Also, we need to host kafka locally via docker: 
+Also, we need to host kafka locally via docker.
+
+The learner is first requested to install docker via this link before running the below commands: https://docs.docker.com/desktop/
+
+When you run the below `docker run` command, the kafka image will first be downloaded onto your machine, if it is not already there. 
 
 ```
 docker run -d --name broker -p 9092:9092 apache/kafka:latest 
@@ -34,6 +38,12 @@ docker exec --workdir /opt/kafka/bin/ -it broker sh
 
 ```
 ./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic pizza-orders
+```
+
+To stop the container:
+
+```
+docker stop broker
 ```
 
 Full removal at the end: 
