@@ -24,11 +24,19 @@ pip install -r requirements.txt
 
 Also, we need to host kafka locally via docker.
 
-The learner is first requested to install docker via this link before running the below commands: https://docs.docker.com/desktop/
+The learner is first requested to install docker via this link before running the below commands: 
+- Windows users: https://docs.docker.com/desktop/setup/install/windows-install/
+- Mac users: https://docs.docker.com/desktop/setup/install/mac-install/
+
+> 💡 **Note:**  Installation of docker desktop on Windows works on Windows and also on wsl ubuntu.
+
+After installation, please start docker desktop by searching for `docker` in Windows/Mac, and double-clicking on the application. After docker desktop has started, you will be able to see this:
+
+![Docker Desktop](./assets/docker_desktop.png)
 
 When you run the below `docker run` command, the kafka image will first be downloaded onto your machine, if it is not already there. 
 
-You may encounter a message `Unable to find image ... locally`. This is **expected** because the image has to be first downloaded from docker hub.
+> 💡 **Note:** You may encounter a message `Unable to find image ... locally`. This is **expected** because the image has to be first downloaded from docker hub.
 
 In the below command, "run" creates and run a docker container. "apache/kafka:latest" tells docker which image to load into container, pulled from the docker hub (https://hub.docker.com/r/apache/kafka).
 
