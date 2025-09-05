@@ -28,22 +28,42 @@ The learner is first requested to install docker via this link before running th
 
 When you run the below `docker run` command, the kafka image will first be downloaded onto your machine, if it is not already there. 
 
+You may encounter a message `Unable to find image ... locally`. This is **expected** because the image has to be first downloaded from docker hub.
+
+In the below command, "run" creates and run a docker container. "apache/kafka:latest" tells docker which image to load into container, pulled from the docker hub (https://hub.docker.com/r/apache/kafka).
+
 ```
 docker run -d --name broker -p 9092:9092 apache/kafka:latest 
 ```
+
+Next access the Kafka CLI inside the container:
 
 ```
 docker exec --workdir /opt/kafka/bin/ -it broker sh
 ```
 
+Create the topic `pizza-orders` using the below:
+
 ```
 ./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic pizza-orders
 ```
 
-To stop the container:
+To stop the container at the end of this exercise:
 
 ```
 docker stop broker
+```
+
+To start a container that has been stopped:
+
+```
+docker start broker
+```
+
+To list all containers (both running and stopped):
+
+```
+docker ps -a
 ```
 
 Full removal at the end: 
@@ -52,8 +72,38 @@ Full removal at the end:
 docker rm -f broker
 ```
 
-Reference: https://hub.docker.com/r/apache/kafka
+To remove the docker image from your machine (save storage space):
 
+```
+docker rmi apache/kafka
+```
+
+### Extra
+
+Some kafka commands are provided below which you may find useful:
+
+To list Kafka topics:
+
+```
+./kafka-topics.sh --list --bootstrap-server localhost:9092
+```
+
+To view the messages inside a Kafka topic:
+
+```
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic pizza-orders --from-beginning
+```
+
+To delete a Kafka topic:
+
+```
+./kafka-topics.sh --delete --topic pizza-orders --bootstrap-server localhost:9092
+```
+
+To exit from the Kafka CLI:
+```
+exit
+```
 
 ---
 
