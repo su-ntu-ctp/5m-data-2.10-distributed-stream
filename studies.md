@@ -19,7 +19,7 @@ Please complete the following activities before our session.
 
 ### **📝 Task 2: Understanding the Event Source (Kafka) (15 Minutes)**
 
-**Activity:** Review the **"Hands-on with Kafka"** notebook (5m\_data\_2\_10\_02\_Hands\_on\_with\_Kafka.ipynb). Pay close attention to how we simulate a real-world scenario using a "Pizza Order" generator.
+**Activity:** Review the **"Hands-on with Kafka"** notebook (`5m\_data\_2\_10\_02\_Hands\_on\_with\_Kafka.ipynb`). Pay close attention to how we simulate a real-world scenario using a "Pizza Order" generator.
 
 **Focus your attention on these key components:**
 
@@ -40,20 +40,20 @@ Please complete the following activities before our session.
 
 1. **Stream as a Table:** Structured Streaming treats a live data stream as a table that is being continuously appended.  
 2. **Micro-batching:** Spark processes these streams as a series of small batch jobs to achieve fault tolerance and low latency.  
-3. **Schema Definition:** Unlike standard Python scripts, Spark Streaming requires a strict schema (StructType) to parse the JSON data effectively.
+3. **Schema Definition:** Unlike standard Python scripts, Spark Streaming requires a strict schema (`StructType`) to parse the JSON data effectively.
 
 **Guiding Questions:**
 
 * How does the "Input Table" concept differ from a static CSV file you might have worked with previously?  
-* We define a pizza\_schema and an order\_schema. Why is a nested schema necessary for the pizzas field?  
-* Review the code block handling shop\_counts. What does .outputMode("complete") imply about how the data is written to the console?
+* We define a `pizza\_schema and an order\_schema`. Why is a nested schema necessary for the pizzas field?  
+* Review the code block handling `shop\_counts`. What does `.outputMode("complete")` imply about how the data is written to the console?
 
 
 ## **🙌🏻 Active Engagement Strategies**
 
 To deepen your retention, try one of the following while you review:
 
-* **"Code Commentary":** Select the complex schema definition block in the Spark notebook. Write a brief comment explaining *why* specific data types (like ArrayType or LongType) were chosen for the pizza toppings or timestamps.  
+* **"Code Commentary":** Select the complex schema definition block in the Spark notebook. Write a brief comment explaining *why* specific data types (like `ArrayType` or `LongType`) were chosen for the pizza toppings or timestamps.  
 * **Scenario Matching:** We are using Pizza Orders as our data. Imagine a generic e-commerce site. What fields would replace "Toppings" and "Pizza Name" in that scenario?  
 * **Visual Tracing:** Sketch the flow of data: *Fake Data Generator* \-\> *Kafka Topic (pizza-orders)* \-\> *Spark Structured Stream* \-\> *Aggregation (Count)* \-\> *Console Output*.
 
