@@ -14,7 +14,7 @@ Please complete the following activities before our session.
 
 **Guiding Questions:**
 
-* We use Docker to host Kafka locally. Why is docker run used to pull the apache/kafka:latest image rather than installing Kafka directly on your OS?  
+* We use Docker to host Kafka locally. Why is docker run used to pull the `apache/kafka:latest` image rather than installing Kafka directly on your OS?  
 * What is the relationship between the Zookeeper/Broker container and the Python scripts we will run?
 
 ### **📝 Task 2: Understanding the Event Source (Kafka) (15 Minutes)**
@@ -24,8 +24,8 @@ Please complete the following activities before our session.
 **Focus your attention on these key components:**
 
 1. **The Producer:** How data is generated. We are simulating a pizza chain with shops like "Marios Pizza" and "Luigis Pizza".  
-2. **Serialization:** Notice that we send data as JSON. In production, we might use binary formats like Avro, but for this session, we deserialize using json.loads.  
-3. **Offsets:** We set auto\_offset\_reset='earliest' to ensure we read from the beginning of the history.
+2. **Serialization:** Notice that we send data as JSON. In production, we might use binary formats like Avro, but for this session, we deserialize using `json.loads`.  
+3. **Offsets:** We set `auto\_offset\_reset='earliest'` to ensure we read from the beginning of the history.
 
 **Guiding Questions:**
 
@@ -34,7 +34,7 @@ Please complete the following activities before our session.
 
 ### **📝 Task 3: The "Unbounded Table" Concept (Spark) (20 Minutes)**
 
-**Activity:** Open the **"Hands-on with Spark (Structured Streaming)"** notebook (5m\_data\_2\_10\_03\_Hands\_on\_with\_Spark\_(Structured\_Streaming).ipynb). **You do not need to run the code yet.** Read the markdown introduction and review the diagrams provided.
+**Activity:** Open the **"Hands-on with Spark (Structured Streaming)"** notebook `(5m\_data\_2\_10\_03\_Hands\_on\_with\_Spark\_(Structured\_Streaming).ipynb)`. **You do not need to run the code yet.** Read the markdown introduction and review the diagrams provided.
 
 **Focus your attention on these key components:**
 
