@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distributed Stream Processing — Module 2.10</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ntu-navy:#1B2A4A; --ntu-dark:#1E3054; --ntu-blue:#2C5697; --ntu-blue-light:#3D6DB5;
+  --ntu-crimson:#C8102E; --ntu-crimson-dark:#A50D26;
+  --bg:#FFFFFF; --bg-off:#F4F5F7; --border:#DDE1E6; --border-light:#E8EAED;
+  --text:#1B2A4A; --text-body:#333D4D; --text-dim:#5F6B7A; --text-light:#8C95A1;
+  --c-data:#2C5697;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; font-family:'Open Sans',sans-serif; font-size:16px; line-height:1.7;
+  color:var(--text-body); background:var(--bg);
+}
+h1,h2,h3,h4{color:var(--text); line-height:1.25; margin:0 0 .6em;}
+p{margin:0 0 1em;}
+a{color:var(--ntu-blue);}
+code{font-family:'SFMono-Regular',Consolas,Menlo,monospace; background:var(--bg-off); padding:.1em .4em; border-radius:3px; font-size:.9em;}
+pre{background:var(--bg-off); border-left:4px solid var(--ntu-blue); border-radius:4px; padding:1rem 1.2rem; overflow-x:auto; font-size:.85rem;}
+pre code{background:none; padding:0;}
+
+/* ---------- progress bar ---------- */
+.progress-bar{position:fixed; top:0; left:0; height:4px; background:var(--ntu-crimson); z-index:999; width:0; transition:width .15s ease;}
+
+/* ---------- sticky sub-nav ---------- */
+.subnav{
+  position:sticky; top:0; z-index:900; background:rgba(255,255,255,.96); backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--border); padding:.6rem 1rem; display:flex; gap:.4rem;
+  overflow-x:auto; white-space:nowrap;
+}
+.subnav a{
+  font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--text-dim); text-decoration:none; padding:.45em .9em; border-radius:999px;
+  border:1px solid var(--border); flex-shrink:0; transition:all .2s ease;
+}
+.subnav a:hover, .subnav a.active{ background:var(--ntu-navy); color:#fff; border-color:var(--ntu-navy); }
+
+/* ---------- hero ---------- */
+.hero{
+  min-height:70vh; background:var(--ntu-navy); color:#fff; display:flex; flex-direction:column;
+  justify-content:center; align-items:flex-start; padding:3rem 6vw; border-bottom:5px solid var(--ntu-crimson);
+  position:relative;
+}
+.hero .tag{ font-size:.72rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:rgba(255,255,255,.7); margin-bottom:1rem;}
+.hero h1{ font-size:clamp(2rem,4.5vw,3.2rem); font-weight:300; color:#fff; max-width:820px;}
+.hero h1 strong{ color:var(--ntu-crimson); font-weight:700;}
+.hero .sub{ font-size:1.05rem; color:var(--text-light); max-width:640px; margin-top:.5rem;}
+.hero .scenario{
+  margin-top:2rem; max-width:680px; background:rgba(255,255,255,.06); border-left:4px solid var(--ntu-crimson);
+  padding:1rem 1.3rem; border-radius:0 4px 4px 0; font-size:.95rem; color:rgba(255,255,255,.9);
+}
+
+/* ---------- section shell ---------- */
+.wrap{ max-width:880px; margin:0 auto; padding:2.5rem 1.25rem;}
+.section-header{
+  background:var(--ntu-navy); border-bottom:5px solid var(--ntu-crimson); color:#fff;
+  padding:2rem 6vw; margin-top:2rem;
+}
+.section-header .eyebrow{ font-size:.72rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--ntu-crimson); margin-bottom:.4rem;}
+.section-header h2{ color:#fff; font-weight:300; font-size:clamp(1.4rem,3vw,2rem); margin:0;}
+.section-header h2 strong{ font-weight:700;}
+.reveal{ opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s ease;}
+.reveal.in{ opacity:1; transform:translateY(0);}
+
+/* ---------- cards & grids ---------- */
+.grid{ display:grid; gap:1.2rem;}
+.grid-2{ grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
+.grid-3{ grid-template-columns:repeat(auto-fit,minmax(200px,1fr));}
+.card{ border:1px solid var(--border); border-top:4px solid var(--ntu-blue); border-radius:4px; padding:1.4rem; background:var(--bg);}
+.card:hover{ transform:scale(1.02); transition:transform .2s ease;}
+.card h4{ font-size:1rem; margin-bottom:.4rem;}
+.card .glyph{ font-size:1.6rem; margin-bottom:.5rem; display:block;}
+.card.crimson{ border-top-color:var(--ntu-crimson);}
+
+.callout{ border-left:4px solid var(--ntu-crimson); background:var(--bg-off); padding:1rem 1.25rem; border-radius:0 4px 4px 0; margin:1.5rem 0;}
+.callout .label{ font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ntu-crimson); display:block; margin-bottom:.3rem;}
+
+table{ width:100%; border-collapse:collapse; margin:1.2rem 0; font-size:.92rem;}
+th,td{ border:1px solid var(--border); padding:.6rem .8rem; text-align:left;}
+th{ background:var(--bg-off); color:var(--text); font-weight:700; font-size:.8rem; text-transform:uppercase; letter-spacing:.04em;}
+tr:hover td{ background:var(--bg-off);}
+
+.tag{ display:inline-block; font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:.2em .6em; border-radius:3px; background:rgba(44,86,151,.12); color:var(--ntu-blue); margin-right:.3rem;}
+
+/* ---------- kafka diagram ---------- */
+.pipeline{ display:flex; align-items:center; gap:.8rem; flex-wrap:wrap; margin:1.5rem 0; font-size:.85rem;}
+.pipe-box{ background:var(--bg-off); border:1px solid var(--border); border-radius:6px; padding:.8rem 1rem; text-align:center; min-width:120px;}
+.pipe-box .glyph{ font-size:1.5rem;}
+.pipe-box strong{ display:block; color:var(--text); font-size:.85rem; margin-top:.2rem;}
+.pipe-box small{ color:var(--text-dim); font-size:.7rem;}
+.pipe-arrow{ color:var(--ntu-crimson); font-size:1.4rem; font-weight:700;}
+.topic-box{ flex:1; min-width:220px; background:#fff; border:2px dashed var(--ntu-blue); border-radius:6px; padding:.7rem;}
+.topic-box .partition-label{ font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--ntu-blue); margin-bottom:.4rem; display:block;}
+.offset-row{ display:flex; gap:.3rem; flex-wrap:wrap; min-height:2.4rem;}
+.msg{ background:var(--ntu-navy); color:#fff; font-size:.72rem; padding:.35em .5em; border-radius:3px; display:flex; flex-direction:column; align-items:center; animation:pop .3s ease;}
+.msg small{ color:var(--text-light); font-size:.6rem;}
+@keyframes pop{ from{opacity:0; transform:scale(.6);} to{opacity:1; transform:scale(1);} }
+
+/* ---------- demo controls ---------- */
+.demo{ background:var(--bg-off); border:1px solid var(--border); border-radius:6px; padding:1.5rem; margin:1.5rem 0;}
+.demo-controls{ display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:1rem;}
+button.btn{
+  font-family:inherit; font-weight:700; font-size:.78rem; letter-spacing:.05em; text-transform:uppercase;
+  border:none; border-radius:4px; padding:.65em 1.1em; cursor:pointer; transition:background .2s ease, transform .1s ease;
+}
+.btn-primary{ background:var(--ntu-crimson); color:#fff;}
+.btn-primary:hover{ background:var(--ntu-crimson-dark);}
+.btn-secondary{ background:var(--ntu-blue); color:#fff;}
+.btn-secondary:hover{ background:var(--ntu-blue-light);}
+.btn:active{ transform:scale(.97);}
+.btn:disabled{ opacity:.4; cursor:not-allowed;}
+.consumer-panel{ display:flex; gap:1.2rem; flex-wrap:wrap; margin-top:1rem;}
+.consumer-card{ flex:1; min-width:220px; background:#fff; border:1px solid var(--border); border-radius:6px; padding:1rem;}
+.consumer-card h5{ margin:0 0 .5rem; font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ntu-blue);}
+.log-line{ font-size:.78rem; padding:.3em 0; border-bottom:1px solid var(--border-light); color:var(--text-body);}
+.log-line b{ color:var(--ntu-navy);}
+.pointer-badge{ display:inline-block; background:var(--ntu-crimson); color:#fff; font-size:.65rem; font-weight:700; padding:.2em .5em; border-radius:3px; margin-top:.5rem;}
+
+/* ---------- streaming table demo ---------- */
+.stream-table-wrap{ display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-start; margin:1.2rem 0;}
+.stream-table{ flex:1; min-width:260px; background:#fff; border:1px solid var(--border); border-radius:6px; overflow:hidden;}
+.stream-table .st-head{ background:var(--ntu-navy); color:#fff; font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; padding:.5rem .8rem;}
+.stream-table .st-body{ max-height:190px; overflow-y:auto;}
+.stream-table .st-row{ display:flex; justify-content:space-between; padding:.4rem .8rem; font-size:.8rem; border-bottom:1px solid var(--border-light); animation:pop .4s ease;}
+.stream-table .st-row:nth-child(odd){ background:var(--bg-off);}
+
+/* ---------- quiz ---------- */
+.quiz-q{ border:1px solid var(--border); border-radius:6px; padding:1.2rem; margin-bottom:1rem; background:#fff;}
+.quiz-q p.question{ font-weight:700; color:var(--text); margin-bottom:.8rem;}
+.quiz-opt{ display:block; width:100%; text-align:left; background:var(--bg-off); border:1px solid var(--border); border-radius:4px; padding:.6em .9em; margin-bottom:.5rem; font-family:inherit; font-size:.88rem; cursor:pointer; transition:all .15s ease;}
+.quiz-opt:hover{ border-color:var(--ntu-blue);}
+.quiz-opt.correct{ background:rgba(26,122,92,.12); border-color:#1A7A5C; color:#1A7A5C; font-weight:700;}
+.quiz-opt.wrong{ background:rgba(200,16,46,.08); border-color:var(--ntu-crimson); color:var(--ntu-crimson-dark);}
+.quiz-feedback{ font-size:.82rem; color:var(--text-dim); margin-top:.4rem; display:none;}
+.quiz-feedback.show{ display:block;}
+#quiz-score{ text-align:center; font-weight:700; color:var(--ntu-navy); font-size:1.1rem;}
+
+/* ---------- glossary ---------- */
+.glossary dt{ font-weight:700; color:var(--ntu-navy); margin-top:1rem;}
+.glossary dd{ margin:.2rem 0 0; color:var(--text-body);}
+
+footer{ background:var(--ntu-navy); color:var(--text-light); padding:2rem 6vw; font-size:.82rem; text-align:center; margin-top:2rem;}
+footer a{ color:#fff;}
+
+@media (max-width:640px){
+  .hero{ padding:2.5rem 5vw;}
+  .section-header{ padding:1.6rem 5vw;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<nav class="subnav" id="subnav">
+  <a href="#why">Why It Matters</a>
+  <a href="#kafka-basics">Kafka Basics</a>
+  <a href="#kafka-demo">Try Kafka</a>
+  <a href="#spark">Spark Streaming</a>
+  <a href="#batch-vs-stream">Batch vs Stream</a>
+  <a href="#check">Check Yourself</a>
+</nav>
+
+<header class="hero">
+  <div class="tag">(SCTP) Advanced Professional Certificate · Data Engineering</div>
+  <h1>Module 2.10 — <strong>Distributed Stream Processing</strong></h1>
+  <p class="sub">From "process yesterday's data today" to "process data as it arrives." A beginner-friendly walkthrough of Apache Kafka and Spark Structured Streaming — no prior streaming experience needed.</p>
+  <div class="scenario">
+    🍕 <strong>The scenario:</strong> FreshCart's delivery team needs the customer to see a live tracking update <em>within seconds</em> of a rider picking up an order — not after tomorrow's batch job. The fraud team needs to flag a suspicious transaction <em>as it happens</em>. This is why we need to move from batch to stream.
+  </div>
+</header>
+
+<!-- ================= WHY IT MATTERS ================= -->
+<section id="why">
+  <div class="section-header reveal"><div class="eyebrow">Where we are</div><h2>Why leave <strong>batch</strong> behind?</h2></div>
+  <div class="wrap">
+    <p class="reveal">Everything you've learned so far — SQL, DataFrames, the data warehouse — assumed data sits still while you query it. Batch processing runs on a schedule: collect a day's data, then process it. That's perfect for a monthly sales report. It's useless for a live delivery map.</p>
+
+    <div class="grid grid-2 reveal">
+      <div class="card">
+        <span class="glyph">🗄️</span>
+        <h4>Batch processing</h4>
+        <p style="margin:0;font-size:.9rem;">Process <em>yesterday's</em> data today. Runs on a schedule (hourly, nightly). High latency, high throughput. Good for reports, training data, historical analysis.</p>
+      </div>
+      <div class="card crimson">
+        <span class="glyph">⚡</span>
+        <h4>Stream processing</h4>
+        <p style="margin:0;font-size:.9rem;">Process data <em>the instant</em> it arrives, one event (or micro-batch) at a time. Low latency. Good for live tracking, fraud alerts, real-time dashboards.</p>
+      </div>
+    </div>
+
+    <div class="callout reveal">
+      <span class="label">Connecting the dots</span>
+      This isn't a replacement for batch — it's a second tool. <strong>Lambda architecture</strong> (from an earlier lesson on data architectures) runs both paths in parallel: a fast streaming path for "good enough right now," and a slow batch path for "fully correct eventually." Knowing when to reach for which is what separates a senior data engineer from a junior one.
+    </div>
+  </div>
+</section>
+
+<!-- ================= KAFKA BASICS ================= -->
+<section id="kafka-basics">
+  <div class="section-header reveal"><div class="eyebrow">Part 1 — Event Streaming</div><h2>Meet <strong>Apache Kafka</strong></h2></div>
+  <div class="wrap">
+    <p class="reveal">Kafka is the backbone most real-time systems are built on. Think of it as a <strong>durable, ordered notice board</strong> that many people can post to and many people can read from — independently, at their own pace.</p>
+
+    <div class="pipeline reveal">
+      <div class="pipe-box">
+        <span class="glyph">📤</span>
+        <strong>Producer</strong>
+        <small>writes events</small>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="topic-box">
+        <span class="partition-label">Topic: pizza-orders (partition 0)</span>
+        <div class="offset-row">
+          <div class="msg">order #1<small>offset 0</small></div>
+          <div class="msg">order #2<small>offset 1</small></div>
+          <div class="msg">order #3<small>offset 2</small></div>
+        </div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-box">
+        <span class="glyph">📥</span>
+        <strong>Consumer</strong>
+        <small>reads events</small>
+      </div>
+    </div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card"><span class="glyph">📨</span><h4>Producer</h4><p style="margin:0;font-size:.85rem;">An app that publishes events to a topic. In our lesson: a script generating fake pizza orders.</p></div>
+      <div class="card"><span class="glyph">🏷️</span><h4>Topic</h4><p style="margin:0;font-size:.85rem;">A named log of events — e.g. <code>pizza-orders</code>. Producers write to it; consumers read from it.</p></div>
+      <div class="card"><span class="glyph">🔢</span><h4>Offset</h4><p style="margin:0;font-size:.85rem;">A bookmark — the position of a message in the log. Consumers track their own offset, so they never lose their place.</p></div>
+      <div class="card"><span class="glyph">📥</span><h4>Consumer</h4><p style="margin:0;font-size:.85rem;">An app that subscribes to a topic and reads events, starting from <code>earliest</code> or <code>latest</code> offset.</p></div>
+      <div class="card"><span class="glyph">🧩</span><h4>Partition</h4><p style="margin:0;font-size:.85rem;">A topic is split into partitions so it can scale across machines. Our demo topic uses just one.</p></div>
+      <div class="card"><span class="glyph">🖥️</span><h4>Broker</h4><p style="margin:0;font-size:.85rem;">The Kafka server that stores the log and serves producers/consumers. We run one locally via Docker.</p></div>
+    </div>
+
+    <div class="callout reveal">
+      <span class="label">Why this matters for FreshCart</span>
+      Every order, delivery update, and payment event gets published once to Kafka. The tracking team, the fraud team, and the analytics team can each run their own consumer over the <em>same</em> durable log — independently, without waiting on each other.
+    </div>
+  </div>
+</section>
+
+<!-- ================= KAFKA DEMO ================= -->
+<section id="kafka-demo">
+  <div class="section-header reveal"><div class="eyebrow">Part 2 — Hands-on with Kafka</div><h2>Try it: <strong>produce &amp; consume</strong></h2></div>
+  <div class="wrap">
+    <p class="reveal">This mirrors <code>notebook/5m_data_2_10_01_Fake_Data_Kafka_Producer.ipynb</code> and <code>..._02_Hands_on_with_Kafka.ipynb</code>. Click below to see how offsets work — notice the consumer only ever moves forward, one message at a time, and two consumers can read the same topic at completely different positions.</p>
+
+    <div class="demo reveal">
+      <div class="demo-controls">
+        <button class="btn btn-primary" id="produceBtn">📤 Produce a pizza order</button>
+        <button class="btn btn-secondary" id="consumeABtn">📥 Consumer A: poll next</button>
+        <button class="btn btn-secondary" id="consumeBBtn">📥 Consumer B: poll next</button>
+        <button class="btn" id="resetBtn" style="background:var(--bg-off);color:var(--text-dim);border:1px solid var(--border);">↺ Reset</button>
+      </div>
+
+      <div class="topic-box">
+        <span class="partition-label">Topic: pizza-orders (partition 0) — log length: <span id="logLength">0</span></span>
+        <div class="offset-row" id="topicLog"></div>
+      </div>
+
+      <div class="consumer-panel">
+        <div class="consumer-card">
+          <h5>Consumer A <span style="color:var(--text-light);font-weight:400;">(auto_offset_reset=earliest)</span></h5>
+          <div id="logA"></div>
+          <span class="pointer-badge">next offset to read: <span id="offsetA">0</span></span>
+        </div>
+        <div class="consumer-card">
+          <h5>Consumer B <span style="color:var(--text-light);font-weight:400;">(joined later)</span></h5>
+          <div id="logB"></div>
+          <span class="pointer-badge">next offset to read: <span id="offsetB">0</span></span>
+        </div>
+      </div>
+    </div>
+
+    <p class="reveal" style="font-size:.88rem;color:var(--text-dim);">Notice: producing doesn't push data to consumers. Messages just sit in the log at their offset until a consumer polls for them — even if that's much later. This is what makes Kafka <em>durable</em> and lets multiple independent readers exist.</p>
+
+    <pre class="reveal"><code>consumer = KafkaConsumer(
+    bootstrap_servers=['localhost:9092'],
+    auto_offset_reset='earliest',
+    value_deserializer=lambda v: json.loads(v.decode('ascii')),
+)
+consumer.subscribe(topics=["pizza-orders"])
+
+for message in consumer:
+    print(message.partition, message.offset, message.value)</code></pre>
+  </div>
+</section>
+
+<!-- ================= SPARK STRUCTURED STREAMING ================= -->
+<section id="spark">
+  <div class="section-header reveal"><div class="eyebrow">Part 3 — Hands-on with Spark</div><h2><strong>Spark Structured Streaming</strong></h2></div>
+  <div class="wrap">
+    <p class="reveal">Here's the one idea that unlocks everything: <strong>a stream is just a table that never stops growing.</strong> Every new event is a new row appended to an "unbounded" input table. Spark re-runs your query on the new rows every trigger interval — the same DataFrame API you already used on static data.</p>
+
+    <div class="stream-table-wrap reveal">
+      <div class="stream-table">
+        <div class="st-head">Input table (growing)</div>
+        <div class="st-body" id="inputTable"></div>
+      </div>
+      <div class="pipe-arrow" style="align-self:center;">→</div>
+      <div class="stream-table">
+        <div class="st-head">Result table (revenue by shop)</div>
+        <div class="st-body" id="resultTable"></div>
+      </div>
+    </div>
+    <div class="demo-controls reveal" style="margin-bottom:1.5rem;">
+      <button class="btn btn-primary" id="tickBtn">▶ Advance one micro-batch</button>
+      <button class="btn" id="autoBtn" style="background:var(--bg-off);color:var(--text-dim);border:1px solid var(--border);">⏱ Auto-play</button>
+    </div>
+
+    <div class="grid grid-2 reveal">
+      <div class="card">
+        <h4>Reading a topic in batch mode</h4>
+        <pre style="margin:0;"><code>pizza_df = spark.read \
+  .format("kafka") \
+  .options(**options) \
+  .load()</code></pre>
+      </div>
+      <div class="card crimson">
+        <h4>Reading the same topic as a stream</h4>
+        <pre style="margin:0;"><code>pizza_df = spark.readStream \
+  .format("kafka") \
+  .options(**options) \
+  .load()
+
+query = parsed_df.writeStream \
+  .format("console") \
+  .start()</code></pre>
+      </div>
+    </div>
+
+    <div class="callout reveal">
+      <span class="label">Key concept</span>
+      Only <code>read</code> → <code>readStream</code> and <code>write</code> → <code>writeStream</code> changed. Every DataFrame transformation you already know — <code>select</code>, <code>groupBy</code>, <code>from_json</code> — works unmodified on the stream. Your batch skills transfer directly.
+    </div>
+  </div>
+</section>
+
+<!-- ================= BATCH VS STREAM ================= -->
+<section id="batch-vs-stream">
+  <div class="section-header reveal"><div class="eyebrow">Closing the loop</div><h2>Batch and stream, <strong>side by side</strong></h2></div>
+  <div class="wrap">
+    <table class="reveal">
+      <tr><th></th><th>Batch (Spark SQL / DataFrames)</th><th>Stream (Kafka + Structured Streaming)</th></tr>
+      <tr><td>When it runs</td><td>On a schedule (e.g. nightly)</td><td>Continuously, as data arrives</td></tr>
+      <tr><td>Latency</td><td>Minutes to hours</td><td>Milliseconds to seconds</td></tr>
+      <tr><td>Data scope</td><td>A fixed, known dataset</td><td>An unbounded, ever-growing log</td></tr>
+      <tr><td>Typical use</td><td>Reports, model training, historical analysis</td><td>Live tracking, alerts, dashboards</td></tr>
+      <tr><td>API</td><td><code>spark.read...</code></td><td><code>spark.readStream...</code> (same DataFrame API)</td></tr>
+    </table>
+    <p class="reveal">The data engineering lifecycle has both paths. Lambda architecture runs them <em>in parallel</em>, fed by the same Kafka topics. Choosing — and eventually unifying — batch and stream pipelines is core architectural judgment for a data engineer.</p>
+  </div>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section id="check">
+  <div class="section-header reveal"><div class="eyebrow">Check yourself</div><h2>Quick <strong>knowledge check</strong></h2></div>
+  <div class="wrap" id="quizWrap"></div>
+</section>
+
+<footer>
+  Module 2.10 · Distributed Stream Processing — (SCTP) Advanced Professional Certificate, NTU<br>
+  Reference: <a href="https://kafka.apache.org/documentation/#gettingStarted" target="_blank" rel="noopener">Apache Kafka docs</a> ·
+  <a href="https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html" target="_blank" rel="noopener">Spark Structured Streaming guide</a>
+</footer>
+
+<script>
+// ---------- scroll reveal ----------
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+},{threshold:.15});
+revealEls.forEach(el=>io.observe(el));
+
+// ---------- progress bar ----------
+const progressBar = document.getElementById('progressBar');
+function updateProgress(){
+  const h = document.documentElement;
+  const scrolled = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  progressBar.style.width = scrolled + '%';
+}
+document.addEventListener('scroll', updateProgress);
+updateProgress();
+
+// ---------- subnav active state ----------
+const subnavLinks = document.querySelectorAll('#subnav a');
+const sections = [...subnavLinks].map(a=>document.querySelector(a.getAttribute('href')));
+function updateSubnav(){
+  let current = sections[0];
+  sections.forEach(s=>{ if(s && s.getBoundingClientRect().top < 140) current = s; });
+  subnavLinks.forEach(a=>a.classList.toggle('active', a.getAttribute('href') === '#'+current.id));
+}
+document.addEventListener('scroll', updateSubnav);
+updateSubnav();
+
+// ---------- Kafka produce/consume demo ----------
+const topicLog = document.getElementById('topicLog');
+const logLength = document.getElementById('logLength');
+const logA = document.getElementById('logA');
+const logB = document.getElementById('logB');
+const offsetA = document.getElementById('offsetA');
+const offsetB = document.getElementById('offsetB');
+const shops = ['Marios Pizza','Luigis Pizza','Circular Pi Pizzeria','Mammamia Pizza'];
+let orderId = 0;
+let log = [];
+let ptrA = 0, ptrB = 0;
+
+function renderTopic(){
+  topicLog.innerHTML = log.map((m,ix)=>`<div class="msg">order #${m.id}<small>offset ${ix}</small></div>`).join('');
+  logLength.textContent = log.length;
+}
+function produce(){
+  orderId++;
+  log.push({ id: orderId, shop: shops[Math.floor(Math.random()*shops.length)] });
+  renderTopic();
+}
+function consume(which){
+  const ptr = which==='A' ? ptrA : ptrB;
+  const target = which==='A' ? logA : logB;
+  const badge = which==='A' ? offsetA : offsetB;
+  if(ptr >= log.length){
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    line.style.color = 'var(--text-light)';
+    line.textContent = 'No new messages — caught up to the log.';
+    target.prepend(line);
+    return;
+  }
+  const msg = log[ptr];
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `offset <b>${ptr}</b>: order #${msg.id} from <b>${msg.shop}</b>`;
+  target.prepend(line);
+  if(which==='A'){ ptrA++; badge.textContent = ptrA; } else { ptrB++; badge.textContent = ptrB; }
+}
+document.getElementById('produceBtn').addEventListener('click', produce);
+document.getElementById('consumeABtn').addEventListener('click', ()=>consume('A'));
+document.getElementById('consumeBBtn').addEventListener('click', ()=>consume('B'));
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  log = []; orderId = 0; ptrA = 0; ptrB = 0;
+  renderTopic(); logA.innerHTML=''; logB.innerHTML=''; offsetA.textContent=0; offsetB.textContent=0;
+});
+// seed with one message so the log isn't empty on load
+produce();
+
+// ---------- Spark stream-as-table demo ----------
+const inputTable = document.getElementById('inputTable');
+const resultTable = document.getElementById('resultTable');
+const sparkOrders = [
+  {shop:'Marios Pizza', cost:18.50}, {shop:'Luigis Pizza', cost:24.00},
+  {shop:'Marios Pizza', cost:12.75}, {shop:'Mammamia Pizza', cost:30.20},
+  {shop:'Luigis Pizza', cost:9.99}, {shop:'Marios Pizza', cost:21.00},
+  {shop:'Mammamia Pizza', cost:15.40}
+];
+let tick = 0;
+let revenue = {};
+function renderResult(){
+  resultTable.innerHTML = Object.entries(revenue)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([shop,total])=>`<div class="st-row"><span>${shop}</span><span><b>$${total.toFixed(2)}</b></span></div>`)
+    .join('');
+}
+function advanceTick(){
+  if(tick >= sparkOrders.length){ tick = 0; inputTable.innerHTML=''; revenue = {}; renderResult(); return; }
+  const o = sparkOrders[tick];
+  const row = document.createElement('div');
+  row.className = 'st-row';
+  row.innerHTML = `<span>row ${tick+1}: ${o.shop}</span><span>$${o.cost.toFixed(2)}</span>`;
+  inputTable.prepend(row);
+  revenue[o.shop] = (revenue[o.shop]||0) + o.cost;
+  renderResult();
+  tick++;
+}
+document.getElementById('tickBtn').addEventListener('click', advanceTick);
+let autoTimer = null;
+document.getElementById('autoBtn').addEventListener('click', function(){
+  if(autoTimer){ clearInterval(autoTimer); autoTimer=null; this.textContent='⏱ Auto-play'; }
+  else { autoTimer = setInterval(advanceTick, 900); this.textContent='⏸ Stop auto-play'; }
+});
+
+// ---------- quiz ----------
+const quizData = [
+  { q:"In Kafka, what is an 'offset'?", opts:["A discount on the message size","A position/bookmark of a message within a partition's log","The number of brokers in the cluster","A type of consumer group"], correct:1 },
+  { q:"Why can two Kafka consumers read the same topic at different positions?", opts:["Kafka duplicates the topic per consumer","Each consumer tracks its own offset independently; producing doesn't push data to consumers", "Kafka deletes messages after one read", "Topics can only have one reader at a time"], correct:1 },
+  { q:"In Spark Structured Streaming, what changes when you go from batch to streaming code?", opts:["You must rewrite all your DataFrame transformations", "Only the read/write calls (read→readStream, write→writeStream) — transformations stay the same", "You need a completely different API", "Streaming doesn't support groupBy"], correct:1 },
+  { q:"What is the core mental model behind Structured Streaming?", opts:["A stream is a queue that discards old data", "A stream is a table that never stops growing — new events are appended rows", "A stream is a batch job that runs every millisecond", "A stream is a single very large file"], correct:1 },
+  { q:"Why does Lambda architecture run both batch and stream paths?", opts:["Because streaming is unreliable and batch is a backup", "Fast streaming path gives 'good enough now'; slower batch path gives 'fully correct eventually'", "It's required by Kafka", "Batch and stream can't share the same data source"], correct:1 }
+];
+const quizWrap = document.getElementById('quizWrap');
+let score = 0, answered = 0;
+quizData.forEach((item, qi)=>{
+  const block = document.createElement('div');
+  block.className = 'quiz-q reveal';
+  block.innerHTML = `<p class="question">${qi+1}. ${item.q}</p>` +
+    item.opts.map((opt,oi)=>`<button class="quiz-opt" data-qi="${qi}" data-oi="${oi}">${opt}</button>`).join('') +
+    `<div class="quiz-feedback" id="fb-${qi}"></div>`;
+  quizWrap.appendChild(block);
+  io.observe(block);
+});
+const scoreBox = document.createElement('div');
+scoreBox.id = 'quiz-score';
+scoreBox.className = 'reveal';
+scoreBox.textContent = `Score: 0 / ${quizData.length}`;
+quizWrap.appendChild(scoreBox);
+io.observe(scoreBox);
+
+quizWrap.addEventListener('click', (e)=>{
+  if(!e.target.classList.contains('quiz-opt')) return;
+  const qi = +e.target.dataset.qi, oi = +e.target.dataset.oi;
+  const block = e.target.closest('.quiz-q');
+  if(block.dataset.done) return;
+  block.dataset.done = '1';
+  const opts = block.querySelectorAll('.quiz-opt');
+  const correctIx = quizData[qi].correct;
+  opts.forEach((o,ix)=>{
+    o.disabled = true;
+    if(ix === correctIx) o.classList.add('correct');
+    else if(ix === oi) o.classList.add('wrong');
+  });
+  const fb = document.getElementById('fb-'+qi);
+  fb.classList.add('show');
+  if(oi === correctIx){ score++; fb.textContent = '✓ Correct.'; }
+  else { fb.textContent = '✗ Not quite — correct answer highlighted above.'; }
+  answered++;
+  scoreBox.textContent = `Score: ${score} / ${quizData.length}`;
+});
+</script>
+</body>
+</html>
