@@ -17,3 +17,5 @@ Stream processing is the frontier of data engineering. While batch processing ha
 **Spark Structured Streaming** — The mental model is powerful: a data stream is just a table that never stops growing. Each new event appends a row. Spark processes this table in micro-batches, applying the same DataFrame API from **Lesson 2.9**. Your batch skills transfer directly to streaming.
 
 **Connecting Batch and Stream** — This unit closes the loop on the entire module. The data engineering lifecycle (**Lesson 2.1**) has both batch and streaming paths. Lambda architecture (**Lesson 2.2**) runs both in parallel. Kafka feeds both paths. Understanding when to use batch vs stream — and how to unify them — is the architectural judgment that distinguishes a senior data engineer from a junior one.
+
+📄 [View lesson 2.10 interactive page](https://su-ntu-ctp.github.io/5m-data-2.10-distributed-stream/)
